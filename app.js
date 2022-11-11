@@ -20,8 +20,9 @@ app.get("/", (request, response, next) => {
   next();
 });
 
-// endpoints
-app.post("/register", (request, response) => {
+// ENDPOINTS SECTION
+
+app.post("/patient/register", (request, response) => {
   // initialize new Pasien object with params from the req
   const pasien = new Pasien({
     idPasien: request.body.idPasien,
@@ -43,5 +44,14 @@ app.post("/register", (request, response) => {
     });
   })
 });
+
+// TODO: COMPLETE & POPULATE API ENDPOINTS
+app.get("/patient", (request, response) => {
+
+})
+
+app.post("/admin/login", (request, response) => {
+  Pasien.findOne({ id: request.body.id })
+})
 
 module.exports = app;

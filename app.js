@@ -51,12 +51,14 @@ app.post("/patient/register", auth, (request, response) => {
   // save the data
   pasien.save()
   .then((result) => {
+    console.log("Pasien dengan ID: " + pasien.idPasien + " berhasil terdaftar")
     response.status(201).send({
       message: "Pasien sukses terdaftar",
       result,
     });
   })
   .catch((error) => {
+    console.log("Pasien dengan ID: " + pasien.idPasien + " gagal terdaftar")
     response.status(500).send({
       message: "Terjadi masalah dalam mendaftarkan pasien",
       error,
@@ -67,7 +69,13 @@ app.post("/patient/register", auth, (request, response) => {
 // GET ONE PASIEN
 app.get("/patient", auth, (request, response) => {
   Pasien.findOne({ idPasien: request.body.idPasien })
-  .then()
+  .then((result) => {
+    console.log("Pasien ditemukan. ID: " + result.idPasien)
+    response.status(200).send({
+      message: "Pasien ditemukan",
+      result,
+    })
+  })
   .catch((e) => {
     response.status(404).send({
       message: "Tidak ada pasien dengan id tersebut ditemukan",
@@ -88,12 +96,14 @@ app.post("/admin/register", (request, response) => {
   // save the data
   admin.save()
   .then((result) => {
+    console.log("Admin " + result.namaAdmin + " berhasil terdaftar")
     response.status(201).send({
       message: "Admin sukses terdaftar",
       result,
     });
   })
   .catch((error) => {
+    console.log("Gagal mendaftarkan admin")
     response.status(500).send({
       message: "Terjadi masalah dalam mendaftarkan Admin",
       error,
@@ -117,6 +127,8 @@ app.post("/admin/login", (request, response) => {
       )
 
       // success response
+      console.log("Berhasil login")
+      console.log("Selamat datang " + result.namaAdmin)
       response.status(200).send({
         message: "Login berhasil",
         idAdmin: admin.idAdmin,
@@ -125,12 +137,15 @@ app.post("/admin/login", (request, response) => {
       })
     }
     else {
+      console.log("Gagal login")
+      console.log("ID dan Password tidak sesuai")
       response.status(400).send({
         message: "ID dan Password tidak sesuai",
       })
     }
   })
   .catch((e) => {
+    console.log("Admin dengan ID tersebut tidak ditemukan")
     response.status(404).send({
       message: "Admin dengan ID tersebut tidak terdaftar",
       e,

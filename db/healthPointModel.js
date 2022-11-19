@@ -3,7 +3,7 @@ const HealthPointSchema = new mongoose.Schema({
     idPemeriksaan: {
         type: String,
         required: [true, "Please provide an ID!"],
-        unique: [true, "ID already exists!"],
+        unique: false,
     },
     timestamp: {
         type: Date,

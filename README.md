@@ -31,6 +31,8 @@ Go to your Postman and create your API calls to http://localhost:3000/
 
 ## Changelog
 
+v0.2.1: fixed Admins and auths problem
+
 v0.2.0: problem with Admins. for now, will be handled via hardcode by frontend. ITMT, find a way to search on a specific collection
 
 v0.1.0: initialize project. create endpoints for User and Admin registration and login

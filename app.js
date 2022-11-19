@@ -42,10 +42,77 @@ app.get("/", (request, response, next) => {
 
 // ENDPOINTS SECTION
 
-// REGISTER PEMERIKSAAN ON PASIEN
-app.post("/patient/pemeriksaan/register", auth, (request, response) => {
-  
+// REGISTER HEALTH POINT ON PEMERIKSAAN
+app.post("/patient/pemeriksaan/healthpoint/", auth, (request, response) => {
+  // initialize new Pemeriksaan object with params from the req
+  const healthPoint = new HealthPoint({
+    idPemeriksaan: request.body.idPemeriksaan,
+    timestamp: request.body.timestamp,
+    heartRate: request.body.heartRate,
+    diastolicBloodPressure: request.body.diastolicBloodPressure,
+    sistolicBloodPressure: request.body.sistolicBloodPressure,
+    bloodOxygen: request.body.bloodOxygen,
+  })
+
+  // save the data
+  healthPoint.save()
+  .then((result) => {
+    response.status(201).send({
+      message: "Titik data berhasil dimasukkan",
+      result,
+    });
+    console.log("[" + healthPoint.timestamp + "] Data masuk")
+  })
+  .catch((error) => {
+    console.log("Titik data gagal dimasukkan")
+    response.status(500).send({
+      message: "Terjadi masalah dalam memasukkan data",
+      error,
+    });
+  })
 })
+
+// GET ONE HEALTH POINT ON PEMERIKSAAN
+
+// GET ALL HEALTH POINTS ON PEMERIKSAAN
+
+// REGISTER PEMERIKSAAN ON PASIEN
+app.post("/patient/pemeriksaan/add", auth, (request, response) => {
+  // initialize new Pemeriksaan object with params from the req
+  const pemeriksaan = new Pemeriksaan({
+    idPemeriksaan: request.body.idPemeriksaan,
+    idPasien: request.body.idPasien,
+    idAdmin: request.body.idAdmin,
+    tanggalMulai: request.body.tanggalMulai,
+  })
+
+  // save the data
+  pemeriksaan.save()
+  .then((result) => {
+    response.status(201).send({
+      message: "Sesi pemeriksaan berhasil dibuat",
+      result,
+    });
+    console.log("Sesi pemeriksaan " + pemeriksaan.idPemeriksaan + " pada pasien " + pemeriksaan.idPasien + " berhasil dibuat")
+  })
+  .catch((error) => {
+    console.log("Sesi pemeriksaan gagal dibuat")
+    response.status(500).send({
+      message: "Terjadi masalah dalam membuat sesi pemeriksaan",
+      error,
+    });
+  })
+})
+
+// UPDATE ADMIN PEMERIKSAAN ON PASIEN
+
+// GET ALL PEMERIKSAAN ON PASIEN
+
+// GET PEMERIKSAAN ON PASIEN
+
+// GET ALL PEMERIKSAAN ON ADMIN
+
+// GET ONE PEMERIKSAAN ON ADMIN
 
 // REGISTER PASIEN
 app.post("/patient/register", auth, (request, response) => {
@@ -79,6 +146,7 @@ app.post("/patient/register", auth, (request, response) => {
 });
 
 // GET ONE PASIEN
+// TODO: BY ID
 app.get("/patient", auth, (request, response) => {
   Pasien.findOne({ idPasien: request.body.idPasien })
   .then((result) => {
@@ -95,6 +163,8 @@ app.get("/patient", auth, (request, response) => {
     })
   })
 })
+
+// GET ALL PATIENTS ON ADMIN
 
 // ADMIN ENDPOINTS SECTION
 // REGISTER ADMIN

@@ -21,7 +21,8 @@ module.exports = async (request, response, next) => {
         next();
     }
     catch (error) {
-        response.staus(401).json({
+        console.log("Invalid request. No authorization.")
+        response.status(401).json({
             error: new Error("Invalid request. No authorization.")
         })
     }

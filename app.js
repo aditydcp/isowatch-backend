@@ -11,6 +11,8 @@ const dbConnect = require("./db/dbConnect");
 // require data models
 const Pasien = require("./db/pasienModel");
 const Admin = require("./db/adminModel");
+const Pemeriksaan = require("./db/pemeriksaanModel")
+const HealthPoint = require("./db/healthPointModel")
 
 // execute database connection 
 dbConnect();
@@ -40,12 +42,22 @@ app.get("/", (request, response, next) => {
 
 // ENDPOINTS SECTION
 
+// REGISTER PEMERIKSAAN ON PASIEN
+app.post("/patient/pemeriksaan/register", auth, (request, response) => {
+  
+})
+
 // REGISTER PASIEN
 app.post("/patient/register", auth, (request, response) => {
   // initialize new Pasien object with params from the req
   const pasien = new Pasien({
     idPasien: request.body.idPasien,
     namaPasien: request.body.namaPasien,
+    tanggalLahir: request.body.tanggalLahir,
+    alamat: request.body.alamat,
+    gender: request.body.gender,
+    keluhan: request.body.keluhan,
+    riwayatPenyakit: request.body.riwayatPenyakit,
   });
 
   // save the data
@@ -83,7 +95,6 @@ app.get("/patient", auth, (request, response) => {
     })
   })
 })
-
 
 // ADMIN ENDPOINTS SECTION
 // REGISTER ADMIN

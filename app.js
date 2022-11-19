@@ -41,7 +41,7 @@ app.get("/", (request, response, next) => {
 // ENDPOINTS SECTION
 
 // REGISTER PASIEN
-app.post("/patient/register", auth, (request, response) => {
+app.post("/patient/register", (request, response) => {
   // initialize new Pasien object with params from the req
   const pasien = new Pasien({
     idPasien: request.body.idPasien,
@@ -67,7 +67,7 @@ app.post("/patient/register", auth, (request, response) => {
 });
 
 // GET ONE PASIEN
-app.get("/patient", auth, (request, response) => {
+app.get("/patient", (request, response) => {
   Pasien.findOne({ idPasien: request.body.idPasien })
   .then((result) => {
     console.log("Pasien ditemukan. ID: " + result.idPasien)

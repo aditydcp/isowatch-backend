@@ -5,11 +5,6 @@ const HealthPointSchema = new mongoose.Schema({
         required: [true, "Please provide an ID!"],
         unique: [true, "ID already exists!"],
     },
-    idPasien: {
-        type: String,
-        required: [true, "Please provide a Patient ID!"],
-        unique: false,
-    },
     timestamp: {
         type: Date,
         required: [true, "Please provide a timestamp"],

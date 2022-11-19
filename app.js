@@ -3,6 +3,7 @@ const app = express();
 const bodyParser = require('body-parser');
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const auth = require("./auth")
 
 // require database connection 
 const dbConnect = require("./db/dbConnect");
@@ -13,6 +14,20 @@ const Admin = require("./db/adminModel");
 
 // execute database connection 
 dbConnect();
+
+// Curb Cores Error by adding a header here
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+  );
+  next();
+});
 
 // body parser configuration
 app.use(bodyParser.json());
@@ -25,7 +40,8 @@ app.get("/", (request, response, next) => {
 
 // ENDPOINTS SECTION
 
-app.post("/patient/register", (request, response) => {
+// REGISTER PASIEN
+app.post("/patient/register", auth, (request, response) => {
   // initialize new Pasien object with params from the req
   const pasien = new Pasien({
     idPasien: request.body.idPasien,
@@ -48,7 +64,8 @@ app.post("/patient/register", (request, response) => {
   })
 });
 
-app.get("/patient", (request, response) => {
+// GET ONE PASIEN
+app.get("/patient", auth, (request, response) => {
   Pasien.findOne({ idPasien: request.body.idPasien })
   .then()
   .catch((e) => {
@@ -59,6 +76,7 @@ app.get("/patient", (request, response) => {
   })
 })
 
+// REGISTER ADMIN
 app.post("/admin/register", (request, response) => {
   // initialize new Admin object with params from the req
   const admin = new Admin({
@@ -83,6 +101,7 @@ app.post("/admin/register", (request, response) => {
   })
 })
 
+// LOGIN ADMIN
 app.post("/admin/login", (request, response) => {
   Admin.findOne({ idAdmin: request.body.idAdmin })
   .then((admin) => {

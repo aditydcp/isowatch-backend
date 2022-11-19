@@ -43,7 +43,7 @@ app.get("/", (request, response, next) => {
 // ENDPOINTS SECTION
 
 // REGISTER HEALTH POINT ON PEMERIKSAAN
-app.post("/patient/pemeriksaan/healthpoint/", auth, (request, response) => {
+app.post("/patient/pemeriksaan/healthpoint", auth, (request, response) => {
   // initialize new Pemeriksaan object with params from the req
   const healthPoint = new HealthPoint({
     idPemeriksaan: request.body.idPemeriksaan,
@@ -72,9 +72,58 @@ app.post("/patient/pemeriksaan/healthpoint/", auth, (request, response) => {
   })
 })
 
-// GET ONE HEALTH POINT ON PEMERIKSAAN
+// GET ONE LATEST HEALTH POINT ON PEMERIKSAAN
+app.get("/patient/pemeriksaan/:id/latest-healthpoint", auth, (request, response) => {
+  Pemeriksaan.findOne({ idPemeriksaan: request.params.id })
+  .then((pemeriksaan) => {
+    HealthPoint.find({ idPemeriksaan: pemeriksaan.idPemeriksaan})
+    .sort({ timestamp: -1 }).limit(1)
+    .then((result) => {
+      response.status(200).send({
+        message: "Health Point terbaru didapatkan",
+        result,
+      })
+    })
+    .catch((error) => {
+      response.status(404).send({
+        message: "Health Point tidak ditemukan dalam sesi pemeriksaan tersebut",
+        error,
+      })
+    })
+  })
+  .catch((e) => {
+    response.status(404).send({
+      message: "Tidak ada sesi pemeriksaan dengan id tersebut ditemukan",
+      e,
+    })
+  })
+})
 
 // GET ALL HEALTH POINTS ON PEMERIKSAAN
+app.get("/patient/pemeriksaan/:id/healthpoint", auth, (request, response) => {
+  Pemeriksaan.findOne({ idPemeriksaan: request.params.id })
+  .then((pemeriksaan) => {
+    HealthPoint.find({ idPemeriksaan: pemeriksaan.idPemeriksaan})
+    .then((result) => {
+      response.status(200).send({
+        message: "Health Point didapatkan",
+        result,
+      })
+    })
+    .catch((error) => {
+      response.status(404).send({
+        message: "Health Point tidak ditemukan dalam sesi pemeriksaan tersebut",
+        error,
+      })
+    })
+  })
+  .catch((e) => {
+    response.status(404).send({
+      message: "Sesi pemeriksaan tidak ditemukan",
+      e,
+    })
+  })
+})
 
 // REGISTER PEMERIKSAAN ON PASIEN
 app.post("/patient/pemeriksaan/add", auth, (request, response) => {
@@ -104,15 +153,144 @@ app.post("/patient/pemeriksaan/add", auth, (request, response) => {
   })
 })
 
-// UPDATE ADMIN PEMERIKSAAN ON PASIEN
+// GET PEMERIKSAAN BY ID
+app.get("/patient/pemeriksaan/:id", auth, (request, response) => {
+  Pemeriksaan.findOne({ idPemeriksaan: request.params.id })
+  .then((result) => {
+    response.status(200).send({
+      message: "Pemeriksaan " + result.idPemeriksaan + " ditemukan",
+      result,
+    })
+    console.log("Pemeriksaan ditemukan. ID: " + result.idPasien)
+  })
+  .catch((e) => {
+    console.log("Pemeriksaan dengan ID: " + request.idPasien + " tidak ditemukan")
+    response.status(404).send({
+      message: "Tidak ada sesi pemeriksaan dengan id tersebut ditemukan",
+      e,
+    })
+  })
+})
+
+// GET ALL ACTIVE PEMERIKSAAN
+app.get("/patient/active-pemeriksaan", auth, (request, response) => {
+  Pemeriksaan.find({ tanggalSelesai: null })
+  .then((result) => {
+    response.status(200).send({
+      message: "Pemeriksaan aktif ditemukan",
+      result,
+    })
+    console.log("Pemeriksaan aktif ditemukan")
+  })
+  .catch((e) => {
+    response.status(404).send({
+      message: "Tidak ada sesi pemeriksaan aktif ditemukan",
+      e,
+    })
+  })
+})
+
+// GET ACTIVE PEMERIKSAAN BY PASIEN
+app.get("/patient/:id/active-pemeriksaan", auth, (request, response) => {
+  Pasien.findOne({ idPasien: request.params.id })
+  .then((pasien) => {
+    Pemeriksaan.find({ idPasien: pasien.idPasien, tanggalSelesai: null })
+    .then((result) => {
+      response.status(200).send({
+        message: "Pemeriksaan aktif ditemukan pada pasien " + pasien.idPasien,
+        result,
+      })
+      console.log("Pemeriksaan aktif ditemukan pada pasien " + pasien.idPasien)
+    })
+    .catch((e) => {
+      response.status(404).send({
+        message: "Tidak ada sesi pemeriksaan aktif ditemukan pada pasien " + pasien.idPasien,
+        e,
+      })
+    })
+  })
+  .catch((e) => {
+    response.status(404).send({
+      message: "Tidak ada pasien dengan id tersebut ditemukan",
+      e,
+    })
+  })
+})
+
+// UPDATE ADMIN PEMERIKSAAN
+app.put("/patient/pemeriksaan/:id", auth, (request, response) => {
+  Pemeriksaan.findOne({ idPemeriksaan: request.params.id })
+  .then((result) => {
+    // kalau admin sudah ada, tidak perlu ditambahkan
+    if(result.idAdmin.includes(request.body.idAdmin)) {
+      return response.status(304).send({
+        message: "Anda sudah tergabung dalam pemeriksaan ini",
+        error,
+      })
+    }
+
+    result.idAdmin.push(request.body.idAdmin)
+
+    result.save()
+    .then((result) => {
+      response.status(202).send({
+        message: "Anda telah bergabung dalam pemeriksaan ini",
+        result,
+      })
+    })
+    .catch((error) => {
+      console.log("Terjadi kesalahan memasukkan Anda dalam pemeriksaan")
+      response.status(500).send({
+        message: "Terjadi masalah dalam memasukkan Admin dalam pemeriksaan",
+        error,
+      });
+    })
+  })
+  .catch((error) => {
+    console.log("Pemeriksaan tidak ditemukan")
+    response.status(404).send({
+      message: "Pemeriksaan tidak ditemukan",
+      error,
+    })
+  })
+})
 
 // GET ALL PEMERIKSAAN ON PASIEN
-
-// GET PEMERIKSAAN ON PASIEN
+app.get("/patient/:id/pemeriksaan", auth, (request, response) => {
+  Pemeriksaan.find({ idPasien: request.params.id })
+  .then((result) => {
+    response.status(200).send({
+      message: "Pemeriksaan ditemukan",
+      result,
+    })
+    console.log("Pemeriksaan ditemukan")
+  })
+  .catch((e) => {
+    response.status(404).send({
+      message: "Tidak ada sesi pemeriksaan dengan pasien tersebut ditemukan",
+      e,
+    })
+  })
+})
 
 // GET ALL PEMERIKSAAN ON ADMIN
+app.get("/admin/:id/pemeriksaan", auth, (request, response) => {
+  Pemeriksaan.find({ idAdmin: request.params.id })
+  .then((result) => {
+    response.status(200).send({
+      message: "Pemeriksaan ditemukan",
+      result,
+    })
+    console.log("Pemeriksaan ditemukan")
+  })
+  .catch((e) => {
+    response.status(404).send({
+      message: "Tidak ada sesi pemeriksaan dengan admin tersebut ditemukan",
+      e,
+    })
+  })
+})
 
-// GET ONE PEMERIKSAAN ON ADMIN
 
 // REGISTER PASIEN
 app.post("/patient/register", auth, (request, response) => {
@@ -145,13 +323,12 @@ app.post("/patient/register", auth, (request, response) => {
   })
 });
 
-// GET ONE PASIEN
-// TODO: BY ID
-app.get("/patient", auth, (request, response) => {
-  Pasien.findOne({ idPasien: request.body.idPasien })
+// GET ONE PASIEN BY ID
+app.get("/patient/:id", auth, (request, response) => {
+  Pasien.findOne({ idPasien: request.params.id })
   .then((result) => {
     response.status(200).send({
-      message: "Pasien ditemukan",
+      message: "Pasien " + result.idPasien + " ditemukan",
       result,
     })
     console.log("Pasien ditemukan. ID: " + result.idPasien)
@@ -165,6 +342,40 @@ app.get("/patient", auth, (request, response) => {
 })
 
 // GET ALL PATIENTS ON ADMIN
+app.get("/admin/:id/patient", auth, (request, response) => {
+  Pemeriksaan.find({ idAdmin: request.params.id })
+  .then((pemeriksaan) => {
+    // create an array to store values
+    let patients = []
+    
+    // store found values into the array
+    pemeriksaan.map((data) => {
+      patients.push(data.idPasien)
+    })
+
+    // get Pasien by stored values
+    Pasien.find({ idPasien: { $in: patients } })
+    .then((result) => {
+      response.status(200).send({
+        message: "Pasien ditemukan",
+        result,
+      })
+      console.log("Pasien ditemukan")
+    })
+    .catch((e) => {
+      response.status(404).send({
+        message: "Tidak ada pasien ditemukan untuk admin tersebut",
+        e,
+      })
+    })
+  })
+  .catch((e) => {
+    response.status(404).send({
+      message: "Tidak ada pasien ditemukan untuk admin tersebut",
+      e,
+    })
+  })
+})
 
 // ADMIN ENDPOINTS SECTION
 // REGISTER ADMIN

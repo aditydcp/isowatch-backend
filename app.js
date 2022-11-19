@@ -41,7 +41,7 @@ app.get("/", (request, response, next) => {
 // ENDPOINTS SECTION
 
 // REGISTER PASIEN
-app.post("/patient/register", (request, response) => {
+app.post("/patient/register", auth, (request, response) => {
   // initialize new Pasien object with params from the req
   const pasien = new Pasien({
     idPasien: request.body.idPasien,
@@ -67,7 +67,7 @@ app.post("/patient/register", (request, response) => {
 });
 
 // GET ONE PASIEN
-app.get("/patient", (request, response) => {
+app.get("/patient", auth, (request, response) => {
   Pasien.findOne({ idPasien: request.body.idPasien })
   .then((result) => {
     response.status(200).send({
@@ -88,41 +88,83 @@ app.get("/patient", (request, response) => {
 // ADMIN ENDPOINTS SECTION
 // REGISTER ADMIN
 app.post("/admin/register", (request, response) => {
-  // initialize new Admin object with params from the req
-  const admin = new Admin({
-    idAdmin: request.body.idAdmin,
-    password: request.body.password,
-    namaAdmin: request.body.namaAdmin,
-  });
+  // hash the password
+  bcrypt
+    .hash(request.body.password, 10)
+    .then((hashedPassword) => {
+      // initialize new Admin object with params from the req
+      const admin = new Admin({
+        idAdmin: request.body.idAdmin,
+        password: hashedPassword,
+        namaAdmin: request.body.namaAdmin,
+      });
 
-  // save the data
-  admin.save()
-  .then((result) => {
-    response.status(201).send({
-      message: "Admin sukses terdaftar",
-      result,
+      // save the data
+      admin.save()
+      .then((result) => {
+        response.status(201).send({
+          message: "Admin sukses terdaftar",
+          result,
+        });
+        console.log("Admin " + result.namaAdmin + " berhasil terdaftar")
+      })
+      .catch((error) => {
+        console.log("Gagal mendaftarkan admin")
+        response.status(500).send({
+          message: "Terjadi masalah dalam mendaftarkan Admin",
+          error,
+        });
+      })
+    })
+    // catch error if password hash failed
+    .catch((error) => {
+      response.status(500).send({
+        message: "Gagal enkripsi password",
+        error,
+      });
     });
-    console.log("Admin " + result.namaAdmin + " berhasil terdaftar")
-  })
-  .catch((error) => {
-    console.log("Gagal mendaftarkan admin")
-    response.status(500).send({
-      message: "Terjadi masalah dalam mendaftarkan Admin",
-      error,
-    });
-  })
 })
 
 // LOGIN ADMIN
 app.post("/admin/login", (request, response) => {
   Admin.findOne({ idAdmin: request.body.idAdmin })
   .then((result) => {
-    response.status(200).send({
-      message: "Admin ditemukan",
-      result,
+    bcrypt.compare(request.body.password, result.password)
+    .then((passwordCheck) => {
+      if(!passwordCheck) {
+        return response.status(400).send({
+          message: "Password tidak sesuai",
+          error,
+        })
+      }
+
+      // create token
+      const token = jwt.sign(
+        {
+          idAdmin: result._id,
+          namaAdmin: result.namaAdmin,
+        },
+        "RANDOM-TOKEN",
+        { expiresIn: "24h" }
+      )
+
+      //   return success response
+      response.status(200).send({
+        message: "Login berhasil",
+        idAdmin: result.idAdmin,
+        namaAdmin: result.namaAdmin,
+        token,
+      })
+      console.log("Admin ditemukan. ID: " + result.idAdmin)
+      console.log("Selamat datang " + result.namaAdmin)
     })
-    console.log("Admin ditemukan. ID: " + result.idAdmin)
-    console.log("Selamat datang " + result.namaAdmin)
+    .catch((error) => {
+      console.log("Password tidak sesuai")
+      response.status(400).send({
+        message: "Password tidak sesuai",
+        error,
+      })
+    })
   })
   .catch((error) => {
     console.log("Admin dengan ID tersebut tidak ditemukan")

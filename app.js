@@ -51,11 +51,11 @@ app.post("/patient/register", (request, response) => {
   // save the data
   pasien.save()
   .then((result) => {
-    console.log("Pasien dengan ID: " + pasien.idPasien + " berhasil terdaftar")
     response.status(201).send({
       message: "Pasien sukses terdaftar",
       result,
     });
+    console.log("Pasien dengan ID: " + pasien.idPasien + " berhasil terdaftar")
   })
   .catch((error) => {
     console.log("Pasien dengan ID: " + pasien.idPasien + " gagal terdaftar")
@@ -70,11 +70,11 @@ app.post("/patient/register", (request, response) => {
 app.get("/patient", (request, response) => {
   Pasien.findOne({ idPasien: request.body.idPasien })
   .then((result) => {
-    console.log("Pasien ditemukan. ID: " + result.idPasien)
     response.status(200).send({
       message: "Pasien ditemukan",
       result,
     })
+    console.log("Pasien ditemukan. ID: " + result.idPasien)
   })
   .catch((e) => {
     response.status(404).send({
@@ -84,6 +84,8 @@ app.get("/patient", (request, response) => {
   })
 })
 
+
+// ADMIN ENDPOINTS SECTION
 // REGISTER ADMIN
 app.post("/admin/register", (request, response) => {
   // initialize new Admin object with params from the req
@@ -96,11 +98,11 @@ app.post("/admin/register", (request, response) => {
   // save the data
   admin.save()
   .then((result) => {
-    console.log("Admin " + result.namaAdmin + " berhasil terdaftar")
     response.status(201).send({
       message: "Admin sukses terdaftar",
       result,
     });
+    console.log("Admin " + result.namaAdmin + " berhasil terdaftar")
   })
   .catch((error) => {
     console.log("Gagal mendaftarkan admin")
@@ -114,41 +116,19 @@ app.post("/admin/register", (request, response) => {
 // LOGIN ADMIN
 app.post("/admin/login", (request, response) => {
   Admin.findOne({ idAdmin: request.body.idAdmin })
-  .then((admin) => {
-    if(admin.password === request.body.password){
-      // create token
-      const token = jwt.sign(
-        {
-          idAdmin: admin.idAdmin,
-          namaAdmin: admin.namaAdmin
-        },
-        "RANDOM_TOKEN",
-        { expiresIn: "24h" }
-      )
-
-      // success response
-      console.log("Berhasil login")
-      console.log("Selamat datang " + result.namaAdmin)
-      response.status(200).send({
-        message: "Login berhasil",
-        idAdmin: admin.idAdmin,
-        namaAdmin: admin.namaAdmin,
-        token,
-      })
-    }
-    else {
-      console.log("Gagal login")
-      console.log("ID dan Password tidak sesuai")
-      response.status(400).send({
-        message: "ID dan Password tidak sesuai",
-      })
-    }
+  .then((result) => {
+    response.status(200).send({
+      message: "Admin ditemukan",
+      result,
+    })
+    console.log("Admin ditemukan. ID: " + result.idAdmin)
+    console.log("Selamat datang " + result.namaAdmin)
   })
-  .catch((e) => {
+  .catch((error) => {
     console.log("Admin dengan ID tersebut tidak ditemukan")
     response.status(404).send({
       message: "Admin dengan ID tersebut tidak terdaftar",
-      e,
+      error,
     })
   })
 })

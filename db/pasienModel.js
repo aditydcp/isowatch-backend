@@ -12,4 +12,4 @@ const PasienSchema = new mongoose.Schema({
     },
 })
 
-module.exports = mongoose.model.Pasien || mongoose.model("Pasien", PasienSchema);
+module.exports = mongoose.model("Pasien", PasienSchema);

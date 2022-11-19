@@ -31,6 +31,8 @@ Go to your Postman and create your API calls to http://localhost:3000/
 
 ## Changelog
 
+v0.3.0: created Pemeriksaan and Health Point entities and endpoints for them. Initialize deployment to Heroku.
+
 v0.2.1: fixed Admins and auths problem
 
 v0.2.0: problem with Admins. for now, will be handled via hardcode by frontend. ITMT, find a way to search on a specific collection

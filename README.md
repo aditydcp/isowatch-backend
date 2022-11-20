@@ -31,6 +31,8 @@ Go to your Postman and create your API calls to http://localhost:3000/
 
 ## Changelog
 
+v0.3.1: create endpoints for Active Pemeriksaan
+
 v0.3.0: created Pemeriksaan and Health Point entities and endpoints for them. Initialize deployment to Heroku.
 
 v0.2.1: fixed Admins and auths problem

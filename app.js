@@ -217,6 +217,33 @@ app.get("/patient/:id/active-pemeriksaan", auth, (request, response) => {
   })
 })
 
+// GET ACTIVE PEMERIKSAAN BY ADMIN
+app.get("/admin/:id/active-pemeriksaan", auth, (request, response) => {
+  Admin.findOne({ idAdmin: request.params.id })
+  .then((admin) => {
+    Pemeriksaan.find({ idAdmin: admin.idAdmin, tanggalSelesai: null })
+    .then((result) => {
+      response.status(200).send({
+        message: "Pemeriksaan aktif ditemukan pada admin " + admin.idAdmin,
+        result,
+      })
+      console.log("Pemeriksaan aktif ditemukan pada admin " + admin.idAdmin)
+    })
+    .catch((e) => {
+      response.status(404).send({
+        message: "Tidak ada sesi pemeriksaan aktif ditemukan pada admin " + admin.idAdmin,
+        e,
+      })
+    })
+  })
+  .catch((e) => {
+    response.status(404).send({
+      message: "Tidak ada admin dengan id tersebut ditemukan",
+      e,
+    })
+  })
+})
+
 // UPDATE ADMIN PEMERIKSAAN
 app.put("/patient/pemeriksaan/:id", auth, (request, response) => {
   Pemeriksaan.findOne({ idPemeriksaan: request.params.id })

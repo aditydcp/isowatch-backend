@@ -192,26 +192,35 @@ app.get("/patient/active-pemeriksaan", auth, (request, response) => {
 
 // GET ACTIVE PEMERIKSAAN BY PASIEN
 app.get("/patient/:id/active-pemeriksaan", auth, (request, response) => {
-  Pasien.findOne({ idPasien: request.params.id })
-  .then((pasien) => {
-    Pemeriksaan.find({ idPasien: pasien.idPasien, tanggalSelesai: null })
-    .then((result) => {
-      response.status(200).send({
-        message: "Pemeriksaan aktif ditemukan pada pasien " + pasien.idPasien,
-        result,
-      })
-      console.log("Pemeriksaan aktif ditemukan pada pasien " + pasien.idPasien)
+  Pemeriksaan.find({ idPasien: request.params.idPasien, tanggalSelesai: null })
+  .then((result) => {
+    response.status(200).send({
+      message: "Pemeriksaan aktif ditemukan pada pasien " + request.params.idPasien,
+      result,
     })
-    .catch((e) => {
-      response.status(404).send({
-        message: "Tidak ada sesi pemeriksaan aktif ditemukan pada pasien " + pasien.idPasien,
-        e,
-      })
-    })
+    console.log("Pemeriksaan aktif ditemukan pada pasien " + request.params.idPasien)
   })
   .catch((e) => {
     response.status(404).send({
-      message: "Tidak ada pasien dengan id tersebut ditemukan",
+      message: "Tidak ada sesi pemeriksaan aktif ditemukan pada pasien " + request.params.idPasien,
+      e,
+    })
+  })
+})
+
+// GET ACTIVE PEMERIKSAAN BY ADMIN
+app.get("/admin/:id/active-pemeriksaan", auth, (request, response) => {
+  Pemeriksaan.find({ idAdmin: request.params.id, tanggalSelesai: null })
+  .then((result) => {
+    response.status(200).send({
+      message: "Pemeriksaan aktif ditemukan untuk admin " + request.params.idAdmin,
+      result,
+    })
+    console.log("Pemeriksaan aktif ditemukan untuk admin " + request.params.idAdmin)
+  })
+  .catch((e) => {
+    response.status(404).send({
+      message: "Tidak ada sesi pemeriksaan aktif ditemukan untuk admin " + request.params.idAdmin,
       e,
     })
   })

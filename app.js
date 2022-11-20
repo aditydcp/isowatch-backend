@@ -43,7 +43,7 @@ app.get("/", (request, response, next) => {
 // ENDPOINTS SECTION
 
 // REGISTER HEALTH POINT ON PEMERIKSAAN
-app.post("/patient/pemeriksaan/healthpoint", auth, (request, response) => {
+app.post("/patient/pemeriksaan/healthpoint", (request, response) => {
   // initialize new Pemeriksaan object with params from the req
   const healthPoint = new HealthPoint({
     idPemeriksaan: request.body.idPemeriksaan,
@@ -73,7 +73,7 @@ app.post("/patient/pemeriksaan/healthpoint", auth, (request, response) => {
 })
 
 // GET ONE LATEST HEALTH POINT ON PEMERIKSAAN
-app.get("/patient/pemeriksaan/:id/latest-healthpoint", auth, (request, response) => {
+app.get("/patient/pemeriksaan/:id/latest-healthpoint", (request, response) => {
   Pemeriksaan.findOne({ idPemeriksaan: request.params.id })
   .then((pemeriksaan) => {
     HealthPoint.find({ idPemeriksaan: pemeriksaan.idPemeriksaan})
@@ -100,7 +100,7 @@ app.get("/patient/pemeriksaan/:id/latest-healthpoint", auth, (request, response)
 })
 
 // GET ALL HEALTH POINTS ON PEMERIKSAAN
-app.get("/patient/pemeriksaan/:id/healthpoint", auth, (request, response) => {
+app.get("/patient/pemeriksaan/:id/healthpoint", (request, response) => {
   Pemeriksaan.findOne({ idPemeriksaan: request.params.id })
   .then((pemeriksaan) => {
     HealthPoint.find({ idPemeriksaan: pemeriksaan.idPemeriksaan})
@@ -126,7 +126,7 @@ app.get("/patient/pemeriksaan/:id/healthpoint", auth, (request, response) => {
 })
 
 // REGISTER PEMERIKSAAN ON PASIEN
-app.post("/patient/pemeriksaan/add", auth, (request, response) => {
+app.post("/patient/pemeriksaan/add", (request, response) => {
   // initialize new Pemeriksaan object with params from the req
   const pemeriksaan = new Pemeriksaan({
     idPemeriksaan: request.body.idPemeriksaan,
@@ -154,7 +154,7 @@ app.post("/patient/pemeriksaan/add", auth, (request, response) => {
 })
 
 // GET PEMERIKSAAN BY ID
-app.get("/patient/pemeriksaan/:id", auth, (request, response) => {
+app.get("/patient/pemeriksaan/:id", (request, response) => {
   Pemeriksaan.findOne({ idPemeriksaan: request.params.id })
   .then((result) => {
     response.status(200).send({
@@ -173,7 +173,7 @@ app.get("/patient/pemeriksaan/:id", auth, (request, response) => {
 })
 
 // GET ALL ACTIVE PEMERIKSAAN
-app.get("/patient/active-pemeriksaan", auth, (request, response) => {
+app.get("/patient/active-pemeriksaan", (request, response) => {
   Pemeriksaan.find({ tanggalSelesai: null })
   .then((result) => {
     response.status(200).send({
@@ -191,7 +191,7 @@ app.get("/patient/active-pemeriksaan", auth, (request, response) => {
 })
 
 // GET ACTIVE PEMERIKSAAN BY PASIEN
-app.get("/patient/:id/active-pemeriksaan", auth, (request, response) => {
+app.get("/patient/:id/active-pemeriksaan", (request, response) => {
   Pasien.findOne({ idPasien: request.params.id })
   .then((pasien) => {
     Pemeriksaan.find({ idPasien: pasien.idPasien, tanggalSelesai: null })
@@ -218,7 +218,7 @@ app.get("/patient/:id/active-pemeriksaan", auth, (request, response) => {
 })
 
 // GET ACTIVE PEMERIKSAAN BY ADMIN
-app.get("/admin/:id/active-pemeriksaan", auth, (request, response) => {
+app.get("/admin/:id/active-pemeriksaan", (request, response) => {
   Admin.findOne({ idAdmin: request.params.id })
   .then((admin) => {
     Pemeriksaan.find({ idAdmin: admin.idAdmin, tanggalSelesai: null })
@@ -245,7 +245,7 @@ app.get("/admin/:id/active-pemeriksaan", auth, (request, response) => {
 })
 
 // UPDATE ADMIN PEMERIKSAAN
-app.put("/patient/pemeriksaan/:id", auth, (request, response) => {
+app.put("/patient/pemeriksaan/:id", (request, response) => {
   Pemeriksaan.findOne({ idPemeriksaan: request.params.id })
   .then((result) => {
     // kalau admin sudah ada, tidak perlu ditambahkan
@@ -283,7 +283,7 @@ app.put("/patient/pemeriksaan/:id", auth, (request, response) => {
 })
 
 // GET ALL PEMERIKSAAN ON PASIEN
-app.get("/patient/:id/pemeriksaan", auth, (request, response) => {
+app.get("/patient/:id/pemeriksaan", (request, response) => {
   Pemeriksaan.find({ idPasien: request.params.id })
   .then((result) => {
     response.status(200).send({
@@ -301,7 +301,7 @@ app.get("/patient/:id/pemeriksaan", auth, (request, response) => {
 })
 
 // GET ALL PEMERIKSAAN ON ADMIN
-app.get("/admin/:id/pemeriksaan", auth, (request, response) => {
+app.get("/admin/:id/pemeriksaan", (request, response) => {
   Pemeriksaan.find({ idAdmin: request.params.id })
   .then((result) => {
     response.status(200).send({
@@ -320,7 +320,7 @@ app.get("/admin/:id/pemeriksaan", auth, (request, response) => {
 
 
 // REGISTER PASIEN
-app.post("/patient/register", auth, (request, response) => {
+app.post("/patient/register", (request, response) => {
   // initialize new Pasien object with params from the req
   const pasien = new Pasien({
     idPasien: request.body.idPasien,
@@ -351,7 +351,7 @@ app.post("/patient/register", auth, (request, response) => {
 });
 
 // GET ONE PASIEN BY ID
-app.get("/patient/:id", auth, (request, response) => {
+app.get("/patient/:id", (request, response) => {
   Pasien.findOne({ idPasien: request.params.id })
   .then((result) => {
     response.status(200).send({
@@ -369,7 +369,7 @@ app.get("/patient/:id", auth, (request, response) => {
 })
 
 // GET ALL PATIENTS ON ADMIN
-app.get("/admin/:id/patient", auth, (request, response) => {
+app.get("/admin/:id/patient", (request, response) => {
   Pemeriksaan.find({ idAdmin: request.params.id })
   .then((pemeriksaan) => {
     // create an array to store values

@@ -31,6 +31,8 @@ Go to your Postman and create your API calls to http://localhost:3000/
 
 ## Changelog
 
+v0.4.0: reworked pemeriksaan model to not depends on Admin and/or Pasien. Pemeriksaan is a strong entity, Admin and Pasien can be added on it. Added endpoint for updating Pasien on Pemeriksaan. implement Pusher and MongoDB change stream.
+
 v0.3.1: create endpoints for Active Pemeriksaan
 
 v0.3.0: created Pemeriksaan and Health Point entities and endpoints for them. Initialize deployment to Heroku.

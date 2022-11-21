@@ -4,6 +4,19 @@ const bodyParser = require('body-parser');
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const auth = require("./auth")
+const Pusher = require('pusher')
+const mongoose = require('mongoose')
+require('dotenv').config()
+
+// configure Pusher object
+const pusher = new Pusher({
+  appId: process.env.app_id,
+  key: process.env.key,
+  secret: process.env.secret,
+  cluster: process.env.cluster,
+  encrypted: true,
+})
+const channel = 'healthpoints'
 
 // require database connection 
 const dbConnect = require("./db/dbConnect");
@@ -16,6 +29,33 @@ const HealthPoint = require("./db/healthPointModel")
 
 // execute database connection 
 dbConnect();
+
+// once database is connected, watch for changes on HealthPoints collection
+const db = mongoose.connection
+db.once('open', () => {
+  const hpCollection = db.collection('healthpoints')
+  const changeStream = hpCollection.watch()
+
+  changeStream.on('change', (change) => {
+    console.log(change);
+    
+    if(change.operationType === 'insert') {
+      const healthpoint = change.fullDocument;
+      pusher.trigger(
+        channel,
+        'inserted', 
+        {
+          idPemeriksaan: healthpoint.idPemeriksaan,
+          timestamp: healthpoint.timestamp,
+          heartRate: healthpoint.heartRate,
+          diastolicBloodPressure: healthpoint.diastolicBloodPressure,
+          sistolicBloodPressure: healthpoint.sistolicBloodPressure,
+          bloodOxygen: healthpoint.bloodOxygen,
+        }
+      )
+    }
+  })
+})
 
 // Curb Cores Error by adding a header here
 app.use((req, res, next) => {
@@ -99,9 +139,10 @@ app.get("/patient/pemeriksaan/:id/latest-healthpoint", auth, (request, response)
   })
 })
 
-// GET ALL HEALTH POINTS ON PEMERIKSAAN
+// GET 20 HEALTH POINTS ON PEMERIKSAAN
 app.get("/patient/pemeriksaan/:id/healthpoint", auth, (request, response) => {
   Pemeriksaan.findOne({ idPemeriksaan: request.params.id })
+  .sort({ timestamp: -1 }).limit(20)
   .then((pemeriksaan) => {
     HealthPoint.find({ idPemeriksaan: pemeriksaan.idPemeriksaan})
     .then((result) => {
@@ -130,8 +171,6 @@ app.post("/patient/pemeriksaan/add", auth, (request, response) => {
   // initialize new Pemeriksaan object with params from the req
   const pemeriksaan = new Pemeriksaan({
     idPemeriksaan: request.body.idPemeriksaan,
-    idPasien: request.body.idPasien,
-    idAdmin: request.body.idAdmin,
     tanggalMulai: request.body.tanggalMulai,
   })
 
@@ -244,8 +283,46 @@ app.get("/admin/:id/active-pemeriksaan", auth, (request, response) => {
   })
 })
 
-// UPDATE ADMIN PEMERIKSAAN
+// UPDATE PASIEN PEMERIKSAAN
 app.put("/patient/pemeriksaan/:id", auth, (request, response) => {
+  Pemeriksaan.findOne({ idPemeriksaan: request.params.id })
+  .then((result) => {
+    // kalau pasien sudah ada, tidak perlu ditambahkan
+    if(result.idPasien) {
+      return response.status(304).send({
+        message: "Sudah ada pasien untuk pemeriksaan ini",
+        error,
+      })
+    }
+
+    result.idPasien = request.body.idPasien
+
+    result.save()
+    .then((result) => {
+      response.status(202).send({
+        message: "Pasien berhasil dimasukkan ke dalam pemeriksaan ini",
+        result,
+      })
+    })
+    .catch((error) => {
+      console.log("Terjadi kesalahan memasukkan pasien dalam pemeriksaan")
+      response.status(500).send({
+        message: "Terjadi masalah dalam memasukkan Pasien dalam pemeriksaan",
+        error,
+      });
+    })
+  })
+  .catch((error) => {
+    console.log("Pemeriksaan tidak ditemukan")
+    response.status(404).send({
+      message: "Pemeriksaan tidak ditemukan",
+      error,
+    })
+  })
+})
+
+// UPDATE ADMIN PEMERIKSAAN
+app.put("/admin/pemeriksaan/:id", auth, (request, response) => {
   Pemeriksaan.findOne({ idPemeriksaan: request.params.id })
   .then((result) => {
     // kalau admin sudah ada, tidak perlu ditambahkan

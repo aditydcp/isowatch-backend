@@ -7,12 +7,12 @@ const PemeriksaanSchema = new mongoose.Schema({
     },
     idPasien: {
         type: String,
-        required: [true, "Please provide a Patient ID!"],
+        required: false,
         unique: false,
     },
     idAdmin: {
         type: [String],
-        required: [true, "Please provide an Admin ID!"],
+        required: false,
         unique: false,
     },
     tanggalMulai: {

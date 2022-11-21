@@ -139,10 +139,10 @@ app.get("/patient/pemeriksaan/:id/latest-healthpoint", auth, (request, response)
   })
 })
 
-// GET ALL HEALTH POINTS ON PEMERIKSAAN
+// GET 20 HEALTH POINTS ON PEMERIKSAAN
 app.get("/patient/pemeriksaan/:id/healthpoint", auth, (request, response) => {
   Pemeriksaan.findOne({ idPemeriksaan: request.params.id })
-  .sort({ timestamp: -1 })
+  .sort({ timestamp: -1 }).limit(20)
   .then((pemeriksaan) => {
     HealthPoint.find({ idPemeriksaan: pemeriksaan.idPemeriksaan})
     .then((result) => {

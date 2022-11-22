@@ -359,6 +359,52 @@ app.put("/admin/pemeriksaan/:id", auth, (request, response) => {
   })
 })
 
+// UPDATE ADMIN AND PASIEN ON PEMERIKSAAN
+app.put("/pemeriksaan/:id", auth, (request, response) => {
+  Pemeriksaan.findOne({ idPemeriksaan: request.params.id })
+  .then((result) => {
+    // kalau pasien sudah ada, tolak permintaan
+    if(result.idPasien) {
+      return response.status(304).send({
+        message: "Sudah ada pasien untuk pemeriksaan ini",
+        error,
+      })
+    }
+    // kalau admin sudah ada, tidak perlu ditambahkan
+    if(result.idAdmin.includes(request.body.idAdmin)) {
+      return response.status(304).send({
+        message: "Anda sudah tergabung dalam pemeriksaan ini",
+        error,
+      })
+    }
+
+    result.idAdmin.push(request.body.idAdmin)
+    result.idPasien = request.body.idPasien
+
+    result.save()
+    .then((result) => {
+      response.status(202).send({
+        message: "Update Admin dan Pasien berhasil",
+        result,
+      })
+    })
+    .catch((error) => {
+      console.log("Terjadi kesalahan dalam update data pemeriksaan")
+      response.status(500).send({
+        message: "Terjadi kesalahan dalam update data pemeriksaan",
+        error,
+      });
+    })
+  })
+  .catch((error) => {
+    console.log("Pemeriksaan tidak ditemukan")
+    response.status(404).send({
+      message: "Pemeriksaan tidak ditemukan",
+      error,
+    })
+  })
+})
+
 // GET ALL PEMERIKSAAN ON PASIEN
 app.get("/patient/:id/pemeriksaan", auth, (request, response) => {
   Pemeriksaan.find({ idPasien: request.params.id })

@@ -83,7 +83,7 @@ app.get("/", (request, response, next) => {
 // ENDPOINTS SECTION
 
 // REGISTER HEALTH POINT ON PEMERIKSAAN
-app.post("/patient/pemeriksaan/healthpoint", auth, (request, response) => {
+app.post("/patient/pemeriksaan/healthpoint", (request, response) => {
   // initialize new Pemeriksaan object with params from the req
   const healthPoint = new HealthPoint({
     idPemeriksaan: request.body.idPemeriksaan,

@@ -168,20 +168,34 @@ app.get("/patient/pemeriksaan/:id/healthpoint", auth, (request, response) => {
 
 // REGISTER PEMERIKSAAN
 app.post("/patient/pemeriksaan/add", (request, response) => {
-  // initialize new Pemeriksaan object with params from the req
-  const pemeriksaan = new Pemeriksaan({
-    idPemeriksaan: request.body.idPemeriksaan,
-    tanggalMulai: request.body.tanggalMulai,
-  })
-
-  // save the data
-  pemeriksaan.save()
+  // get the current total (assumming no deletion) of pemeriksaan
+  Pemeriksaan.find()
   .then((result) => {
-    response.status(201).send({
-      message: "Sesi pemeriksaan berhasil dibuat",
-      result,
-    });
-    console.log("Sesi pemeriksaan " + pemeriksaan.idPemeriksaan + " pada pasien " + pemeriksaan.idPasien + " berhasil dibuat")
+    // add overhead "0" and increment the number
+    let newId = "0" + (result.length + 1).toString()
+
+    // initialize new Pemeriksaan object with params from the req
+    const pemeriksaan = new Pemeriksaan({
+      idPemeriksaan: newId,
+      tanggalMulai: request.body.tanggalMulai,
+    })
+
+    // save the data
+    pemeriksaan.save()
+    .then((result) => {
+      response.status(201).send({
+        message: "Sesi pemeriksaan berhasil dibuat",
+        result,
+      });
+      console.log("Sesi pemeriksaan " + pemeriksaan.idPemeriksaan + " pada pasien " + pemeriksaan.idPasien + " berhasil dibuat")
+    })
+    .catch((error) => {
+      console.log("Sesi pemeriksaan gagal dibuat")
+      response.status(500).send({
+        message: "Terjadi masalah dalam membuat sesi pemeriksaan",
+        error,
+      });
+    })
   })
   .catch((error) => {
     console.log("Sesi pemeriksaan gagal dibuat")
@@ -189,6 +203,25 @@ app.post("/patient/pemeriksaan/add", (request, response) => {
       message: "Terjadi masalah dalam membuat sesi pemeriksaan",
       error,
     });
+  })
+})
+
+// GET ALL PEMERIKSAAN
+app.get("/patient/pemeriksaan/", auth, (request, response) => {
+  Pemeriksaan.find()
+  .then((result) => {
+    response.status(200).send({
+      message: "Pemeriksaan didapatkan",
+      result,
+    })
+    console.log("Pemeriksaan didapatkan")
+  })
+  .catch((error) => {
+    console.log("Tidak ada sesi pemeriksaan")
+    response.status(404).send({
+      message: "Tidak ada sesi pemeriksaan",
+      error,
+    })
   })
 })
 

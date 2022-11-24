@@ -183,10 +183,7 @@ app.post("/patient/pemeriksaan/add", (request, response) => {
     // save the data
     pemeriksaan.save()
     .then((result) => {
-      response.status(201).send({
-        message: "Sesi pemeriksaan berhasil dibuat",
-        result,
-      });
+      response.status(201).send(result);
       console.log("Sesi pemeriksaan " + pemeriksaan.idPemeriksaan + " pada pasien " + pemeriksaan.idPasien + " berhasil dibuat")
     })
     .catch((error) => {

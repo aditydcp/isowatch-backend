@@ -166,8 +166,8 @@ app.get("/patient/pemeriksaan/:id/healthpoint", auth, (request, response) => {
   })
 })
 
-// REGISTER PEMERIKSAAN ON PASIEN
-app.post("/patient/pemeriksaan/add", auth, (request, response) => {
+// REGISTER PEMERIKSAAN
+app.post("/patient/pemeriksaan/add", (request, response) => {
   // initialize new Pemeriksaan object with params from the req
   const pemeriksaan = new Pemeriksaan({
     idPemeriksaan: request.body.idPemeriksaan,

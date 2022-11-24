@@ -31,6 +31,8 @@ Go to your Postman and create your API calls to http://localhost:3000/
 
 ## Changelog
 
+v0.4.3: add Get all Pemeriksaan endpoint and implement auto 'ID' increment for creating Pemeriksaan
+
 v0.4.2: remove auth on Create Pemeriksaan to provide suitable use case for the Wear App
 
 v0.4.1: added endpoint for updating Admin and Pasien on Pemeriksaan at the same time

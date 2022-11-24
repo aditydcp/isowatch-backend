@@ -1,6 +1,6 @@
 {
   "name": "isowatch-backend",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "description": "backend system for isowatch",
   "main": "index.js",
   "scripts": {

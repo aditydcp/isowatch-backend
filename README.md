@@ -1,10 +1,58 @@
 # IsoWatch Back-end
 
-[![Status badge](https://img.shields.io/badge/status-development-blue.svg)](https://shields.io/)
+[![Status badge](https://img.shields.io/badge/status-completed-blue.svg)](https://shields.io/)
 
 This is the server-side repository for Capstone Project: IsoWatch.
 
-Go to [client-side repository](https://github.com/aditydcp/isowatch-frontend).
+This project is not yet 100% complete. Our targets can be found on the **[issues](https://github.com/aditydcp/isowatch-backend/issues)**.
+
+*Note*
+
+Some things might change or not work due to Heroku new policy effective per Nov 28, 2022.
+
+*Last deployed: Nov 25, 2022*
+
+## About the Project
+
+This project is a Capstone Project for our final year assignment. This is a simulation of IoT project using a wearable thing (in this case, WearOS wearables) to collect data, transmit it to server and have the data be presented on the client web app.
+
+Tools used in this project:
+* **Client-side Web App**
+  * React.js
+    * Rechart: for displaying graphs
+    * React Hook Form: for making forms
+    * Axios: for making API calls
+    * Universal Cookie: for cookie management
+  * Pusher: for listening on events of database change
+* **Server-side Web App**
+  * Node.js & Express.js
+    * Mongoose: for creating collection schema and MongoDB connection, and also watching for database change
+    * Body parser: for parsing JSON request bodies
+    * Jsonwebtoken: for creating token of authorization
+    * bcrypt: for encrypting password
+  * MongoDB: for storing data
+  * Pusher: for publishing events of database change
+* **WearOS App**
+  * Kotlin language
+    * Android Wear dependencies: for enabling Wear-specific input, layout and materials
+    * Retrofit: for sending HTTP requests
+    * Moshi: for parsing JSON into and from Kotlin objects
+    * OkHTTP: for dealing with backward compatibilities
+    * Samsung Privileged SDK: for accessing sensors
+
+**[Client-side repository]** can be found [here](https://github.com/aditydcp/isowatch-frontend).
+
+**[WearOS App repository]** can be found [here](https://github.com/aditydcp/isowatch-app).
+
+As this project is not yet 100% complete. The targets for each repository can be found on their corresponding **issues** page.
+
+For more information about the project, please **[contact me](https://github.com/aditydcp)**.
+
+Departemen Teknik Elektro dan Teknologi Informasi
+
+Universitas Gadjah Mada
+
+2022
 
 ## Installation
 
